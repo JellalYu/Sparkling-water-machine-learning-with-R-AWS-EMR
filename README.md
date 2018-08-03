@@ -25,6 +25,83 @@ This experiment mainly lead you to use the R studio in AWS EMR services and Spar
 https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
 
 
+###
+
+
+INSTALL RSTUDIO SERVER
+# Update
+sudo yum update
+sudo yum install libcurl-devel openssl-devel # used for devtools
+
+# Install RStudio Server
+wget -P /tmp https://s3.amazonaws.com/rstudio-dailybuilds/rstudio-server-rhel-0.99.1266-x86_64.rpm
+sudo yum install --nogpgcheck /tmp/rstudio-server-rhel-0.99.1266-x86_64.rpm
+
+# Make User
+sudo useradd -m rstudio-user
+sudo passwd rstudio-user
+
+# Permission
+export HADOOP_USER_NAME=yarn
+
+# Create new directory in hdfs
+hadoop fs -mkdir /user/rstudio-user
+hadoop fs -chmod 777 /user/rstudio-user
+
+Load data from github
+# Make download directory
+mkdir /tmp/wineQualityWhites
+
+wget -O /tmp/wineQualityWhites.csv https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/JellalYu/Sparkling-water-machine-learning-with-R-AWS-EMR/blob/master/wineQualityWhites.csv
+
+DISTRIBUTE INTO HDFS
+# Copy data to HDFS
+hadoop fs -mkdir /user/rstudio-user/wineQualityWhites/
+hadoop fs -put /tmp/wineQualityWhites /user/rstudio-user/
+
+Create Hive tables
+# Open Hive prompt
+hive
+
+# Create metadata for airlines
+CREATE EXTERNAL TABLE IF NOT EXISTS wineQualityWhites
+(
+fixed.acidity	int
+volatile.acidity	int
+citric.acid		int
+residual.sugar	int
+chlorides		int
+free.sulfur.dioxide	int
+total.sulfur.dioxide	int
+density		int
+pH		int
+sulphates		int
+alcohol		int
+quality		int
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+TBLPROPERTIES("skip.header.line.count"="1");
+
+# Load data into table
+LOAD DATA INPATH '/user/rstudio-user/wineQualityWhites ' INTO TABLE wineQualityWhites;
+
+ 
+
+R
+pack<-c("sparklyr","readr","knitr","tidyr","ggplot2","ggrepel","dplyr","jsonlite","h2o","rsparkling")
+ipak <- function(pkg){
+  new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+  if (length(new.pkg)) 
+    install.packages(new.pkg, dependencies = TRUE)
+  sapply(pkg, require, character.only = TRUE)
+}
+ipak(pack);lapply(pack, require, character.only = TRUE)
+
+
+
+
 
 
 
