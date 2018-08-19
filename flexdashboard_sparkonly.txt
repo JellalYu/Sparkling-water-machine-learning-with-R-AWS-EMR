@@ -22,6 +22,16 @@ library(kableExtra)
 Sys.setenv(SPARK_HOME='/usr/lib/spark')
 sc <- spark_connect(master = "yarn-client", version = "2.1.0")
 Wine_tbl <- copy_to(sc, Wine)
+ml_formula <- formula(quality ~ fixed_acidity + volatile_acidity + citric_acid + residual_sugar + chlorides+free_sulfur_dioxide+total_sulfur_dioxide+ density + pH + sulphates + alcohol)
+
+# Bundle the modelss into a single list object
+ml_models <- list(
+  "Linear" = ml_lm,
+  "Decision Tree" = ml_dt,
+  "Random Forest" = ml_rf,
+  "Naive Bayes" = ml_nb
+)
+
 ```
 Variables
 =======================================================================
@@ -125,25 +135,9 @@ Row{.tabset}
 
 ### Feature Importance
     
-```{r  fig.height = 6, fig.width = 6.5}
-# Bundle the modelss into a single list object
-ml_models <- list(
-  "Linear" = ml_lm,
-  "Decision Tree" = ml_dt,
-  "Random Forest" = ml_rf,
-  "Naive Bayes" = ml_nb
-)
+```{r  fig.height = 6, fig.width = 9}
 
 
-# Initialize results
-feature_importance <- data_frame()
-
-# Calculate feature importance
-for(i in c("Decision Tree", "Random Forest")){
-  feature_importance <- ml_tree_feature_importance(ml_models[[i]]) %>%
-    mutate(Model = i) %>%
-    rbind(feature_importance, .)
-}
 
 # Plot results
 feature_importance %>%
@@ -162,7 +156,7 @@ Model Comparison
 =======================================================================
 Column
 -----------------------------------------------------------------------
-```{r}
+```{r  fig.height = 6, fig.width = 10}
 # Number of reps per model
 n <- 10
 
