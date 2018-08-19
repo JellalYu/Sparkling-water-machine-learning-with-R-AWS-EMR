@@ -8,7 +8,7 @@ output:
 
 ```{r setup, include=FALSE}
 
-load('usr/bin/result.Rdata')
+load('/home/rstudio-user/result.Rdata')
 
 library(sparklyr)
 library(knitr)
