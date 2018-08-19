@@ -163,11 +163,10 @@ ggplot(data = mComp) +
 
 Column
 -----------------------------------------------------------------------
- ```{r  fig.height = 6, fig.width = 9.5}
+\```{r  fig.height = 6, fig.width = 9.5}
 kable(Comp)%>%
   kable_styling()%>%
   scroll_box(height = "300px",width = "600px")
-
 \```
 
 ```
